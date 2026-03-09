@@ -3,14 +3,21 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
+
+    const UPDATED_AT = null;
 
     /**
      * The attributes that are mass assignable.
@@ -18,9 +25,15 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'student_code',
+        'full_name',
+        'password_hash',
         'email',
-        'password',
+        'phone',
+        'age',
+        'birth_date',
+        'career_id',
+        'specialization_id'
     ];
 
     /**
@@ -45,4 +58,58 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    //Relationships
+
+    public function enrollments() : HasMany
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function career() : BelongsTo
+    {
+        return $this->belongsTo(Career::class);
+    }
+
+    public function specialization() : BelongsTo
+    {
+        return $this->belongsTo(Specialization::class);
+    }
+    public function academic_records() : HasMany
+    {
+        return $this->hasMany(AcademicRecord::class);
+    }
+
+    //Query Functions
+
+    public static function getByCode($code = null) : ?static
+        {
+        if(!$code){
+            return null;
+        }
+
+        return static::where('student_code',$code)->first();
+    }
+
+    public static function findByCodeWithRelationships($code = null){
+        if(!$code){
+            return null;
+        }
+
+        return static::query()
+                    ->select('*')
+                    ->where('student_code',$code)
+                    ->with(['career','specialization'])
+                    ->first();
+    }
+
+    public static function listAllWithRelationships() : Collection
+    {
+        return static::with(['career','specialization'])
+                    ->orderBy("role","asc")
+                    ->orderBy("full_name","asc")
+                    ->get();
+    }
+
+
 }
