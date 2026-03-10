@@ -2,6 +2,7 @@
 
 use App\Constants\Roles;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Gestor\AcademicRecordController;
 use App\Http\Controllers\Gestor\CareerController;
 use App\Http\Controllers\Gestor\EnrollmentsController;
 use App\Http\Controllers\Gestor\SpecializationController;
@@ -17,6 +18,7 @@ Route::post('login',[AuthController::class,"login"]);
 Route::middleware('auth:sanctum')->group(function () {
     //Rutas que solo pueden acceder los administradores
     Route::middleware('abilities:' . Roles::ADMIN)->group(function (){
+        Route::put("users/{user}/academic_records/bulk",[AcademicRecordController::class,"bulkUpdate"]);
         Route::apiResource('users',UserController::class);       //Todo el apiResource de users, los usuarios regularas usaran otras rutas para ver y actualizar sus datos.
     });
 
