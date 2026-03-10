@@ -121,6 +121,10 @@ class AuthController extends Controller
                 ]);
             });
         } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "message" => "Error en Onboarding: " . $e->getMessage() 
+            ],500);
         }
     }
 
