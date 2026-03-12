@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('av_submissions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('assignment_id')->constrained('av_assignments');
+            $table->foreignId('classroom_user_id')->constrained('av_classroom_user');
+            $table->text('content')->default('');
+            $table->string('file_path')->unique()->nullable();
+            $table->timestamp('submitted_at')->useCurrent();
+            $table->decimal('grade');
+            $table->text('teacher_feedback')->nullable();
             $table->timestamps();
         });
     }

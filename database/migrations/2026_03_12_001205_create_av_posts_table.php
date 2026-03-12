@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('av_posts', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('classroom_id')->constrained('av_classrooms')->onDelete('cascade');
+            $table->foreignId('classroom_user_id')->constrained('av_classroom_user')->onDelete('cascade');
+            $table->enum('type',['announcement','material'])->default('announcement');
+            $table->string('title');
+            $table->text('content')->default('');
+            $table->string('file_path')->nullable();
             $table->timestamps();
         });
     }
