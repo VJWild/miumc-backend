@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('classroom_user_id')->constrained('av_classroom_user')->onDelete('cascade');
             $table->enum('type',['announcement','material'])->default('announcement');
             $table->string('title');
-            $table->text('content')->default('');
+            $table->text('content')->nullable();
             $table->string('file_path')->nullable();
             $table->timestamps();
         });

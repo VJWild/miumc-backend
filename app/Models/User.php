@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -78,6 +79,16 @@ class User extends Authenticatable
     public function academic_records() : HasMany
     {
         return $this->hasMany(AcademicRecord::class);
+    }
+
+    public function classrooms() : BelongsToMany
+    {
+        return $this->belongsToMany(
+            Classroom::class,
+            'av_classroom_user',
+            'user_id',
+            'classroom_id'
+        );
     }
 
     //Query Functions

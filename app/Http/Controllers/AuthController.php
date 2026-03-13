@@ -32,45 +32,23 @@ class AuthController extends Controller
             ],401);
         }
 
-        //Creación del token Sanctum
-        $nameArr = explode(" ",$user->full_name);
-        $deviceName = $request->header('User-Agent') ?: 'Unknown';
-        $tokenName = join("",$nameArr) . "_" . $deviceName;
-
-        //Asginación de permisos según el rol
-        $permissions = match($user->role) {
-            'admin' => [Roles::ADMIN],
-            'cadete' => [Roles::CADET],
-            default => [],
-        };
-
-        $tokenStr = $user->createToken($tokenName,$permissions)->plainTextToken;
-
-        return response()->json([
-            'success' => true,
-            'user' => $user,
-            'access_token' => $tokenStr,
-            'token_type' => 'Bearer'
-        ]);
+        return $this->generateAuthResponse($user,$request);
     }
 
     public function register(Request $request){
         $validated = $request->validate([
             "studentCode" => "required|string|max:255",
             "email" => "required|string|email|unique:users",
-            "password" => "required|string|min:8|confirmed"
+            "password" => "required|string|min:8"
         ]);
 
-        User::create([
+        $user = User::create([
             "student_code" => $validated['studentCode'],
             "email" => $validated['email'],
             "password_hash" => Hash::make($validated['password'])
         ]);
 
-        return response()->json([
-            "success" => true,
-            "message" => "Usuario creado correctamente"
-        ], 200);
+        return $this->generateAuthResponse($user,$request);
     }
 
     public function completeOnboarding(Request $request){
@@ -82,8 +60,9 @@ class AuthController extends Controller
                 "required",
                 "date",
                 Rule::date()->format("Y-m-d"),
-                Rule::date()->beforeOrEqual(today()->subYears($request->input("age")))
+                Rule::date()->beforeOrEqual(today()->subYears($request->integer("age")))
             ],
+            "careerId" => "required|integer",
             "phone" => "required|string|regex:/^0\d{3}-\d{7}$/",
             "mencionId" => "required|integer",
             "approvedSubjects" => "required"
@@ -98,6 +77,7 @@ class AuthController extends Controller
                     "age" => $validated['age'],
                     "birth_date" => $validated['birthDate'],
                     "phone" => $validated['phone'],
+                    "career_id" =>$validated['careerId'],
                     "specialization_id" => $validated['mencionId'],
                 ]);
 
@@ -132,5 +112,34 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(["message" => 'Sesión cerrada']);
+    }
+
+    private function generateAuthResponse(User $user, Request $request){
+        //Creación del token Sanctum
+        $nameArr = explode(" ",$user->full_name);
+        $tokenName = join("",$nameArr);
+
+        //Asginación de permisos según el rol
+        $permissions = match($user->role) {
+             "admin"=>[Roles::ADMIN],
+             "cadete"=>[Roles::CADET],
+             default=>[]
+        };
+
+        $tokenResult = $user->createToken($tokenName,$permissions); //Crea el Token
+        $tokenModel = $tokenResult->accessToken;    //Instancia el modelo del Token para poder editarlo
+        $tokenStr = $tokenResult->plainTextToken;   //Obtiene el string del token
+
+        $tokenModel->forceFill([
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->header('User-Agent')
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'user' => $user,
+            'access_token' => $tokenStr,
+            'token_type' => 'Bearer'
+        ]);
     }
 }

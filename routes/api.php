@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('register',[AuthController::class,"register"]);
 Route::post('login',[AuthController::class,"login"]);
+Route::post('onboarding/complete',[AuthController::class,"completeOnboarding"]);
+
 
 //Rutas protegidas por autenticación (Solo usuarios logeados pueden acceder)
 Route::middleware('auth:sanctum')->group(function () {
@@ -29,7 +31,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Ruta que cualquier usuario autenticado puede acceder
     Route::get("progress/{code}",[SubjectController::class,"getStudentProgress"]);
-    Route::post('onboarding/complete',[AuthController::class,"completeOnboarding"]);
     Route::post('logout',[AuthController::class,"logout"]);
 }); 
 

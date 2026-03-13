@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('av_classrooms', function (Blueprint $table) {
             $table->id();
             $table->string("title");
-            $table->text('description')->default('');
+            $table->text('description')->nullable();
             $table->string('cover_path')->default('');
             $table->string('access_code');
             $table->timestamps();

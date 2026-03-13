@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('assignment_id')->constrained('av_assignments');
             $table->foreignId('classroom_user_id')->constrained('av_classroom_user');
-            $table->text('content')->default('');
+            $table->text('content')->nullable();
             $table->string('file_path')->unique()->nullable();
             $table->timestamp('submitted_at')->useCurrent();
             $table->decimal('grade');

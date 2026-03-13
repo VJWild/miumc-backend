@@ -17,7 +17,7 @@ return new class extends Migration
             $table->tinyText("title");
             $table->text("description");
             $table->tinyText("cover_path");
-            $table->tinyText("file_path")->unique();
+            $table->string("file_path")->unique();
             $table->enum("status",["active","pending","prohibited"]);
             $table->timestamps();
         });

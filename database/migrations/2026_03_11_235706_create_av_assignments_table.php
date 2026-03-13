@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('classroom_id')->constrained('av_classrooms')->onDelete('cascade');
             $table->string('title');
-            $table->text('description')->default('');
+            $table->text('description')->nullable();
             $table->string('file_path')->nullable();
             $table->dateTime('due_time');
             $table->decimal('points');
