@@ -2,8 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\AulaVirtual\Assignment;
+use App\Models\AulaVirtual\Post;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Classroom extends Model
 {
@@ -16,10 +21,6 @@ class Classroom extends Model
         "access_code"
     ];
 
-    protected $hidden = [
-        "access_code"
-    ];
-
     //Relationships
 
     public function members() : BelongsToMany
@@ -29,30 +30,39 @@ class Classroom extends Model
             'av_classroom_user',
             "classroom_id",
             "user_id"
-        )->withPivot('role');
+        );
     }
 
-    public function teacher() : BelongsToMany
+    public function professor() : BelongsTo
     {
-        return $this->belongsToMany(
-            User::class,
-            'av_classroom_user',
-            'classroom_id',
-            'user_id'
-        )->wherePivot('role','teacher')
-         ->withPivot('role')
-         ->one();
+        return $this->belongsTo(User::class);
     }
 
-    public function students() : BelongsToMany
+    public function assignments() : HasMany
     {
-        return $this->belongsToMany(
-            User::class,
-            'av_classroom_user',
-            'classroom_id',
-            'user_id'
-        )->wherePivot('role','student')
-         ->withPivot('role')
-         ->withTimestamps();
+        return $this->hasMany(Assignment::class);
+    }
+
+    public function posts() : HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    //Utilities
+
+    public static function generateUniqueCode()
+    {
+        do{
+            $code = Str::upper(Str::random(6));
+        } while (static::where('access_code',$code)->exists());
+
+        return $code;
+    }
+
+    //Scopes
+
+    public function scopeWithAll($query)
+    {
+        return $query->with(['members','professor','assignments','posts']);
     }
 }

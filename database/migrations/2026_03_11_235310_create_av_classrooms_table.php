@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('av_classrooms', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string("title");
             $table->text('description')->nullable();
-            $table->string('cover_path')->default('');
+            $table->string('cover_path')->default('covers/cover.jpg');
             $table->string('access_code');
             $table->timestamps();
         });

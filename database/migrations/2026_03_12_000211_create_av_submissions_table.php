@@ -18,7 +18,8 @@ return new class extends Migration
             $table->text('content')->nullable();
             $table->string('file_path')->unique()->nullable();
             $table->timestamp('submitted_at')->useCurrent();
-            $table->decimal('grade');
+            $table->boolean('is_graded')->default(0);
+            $table->decimal('grade')->nullable();
             $table->text('teacher_feedback')->nullable();
             $table->timestamps();
         });

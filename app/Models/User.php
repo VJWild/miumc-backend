@@ -62,6 +62,8 @@ class User extends Authenticatable
 
     //Relationships
 
+    //  Gestor
+
     public function enrollments() : HasMany
     {
         return $this->hasMany(Enrollment::class);
@@ -81,7 +83,9 @@ class User extends Authenticatable
         return $this->hasMany(AcademicRecord::class);
     }
 
-    public function classrooms() : BelongsToMany
+    //  Aula Virtual
+
+    public function enrolledClassrooms() : BelongsToMany
     {
         return $this->belongsToMany(
             Classroom::class,
@@ -89,6 +93,11 @@ class User extends Authenticatable
             'user_id',
             'classroom_id'
         );
+    }
+
+    public function managedClassrooms() : HasMany
+    {
+        return $this->hasMany(Classroom::class, 'user_id');
     }
 
     //Query Functions
