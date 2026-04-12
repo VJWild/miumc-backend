@@ -2,7 +2,7 @@
 
 namespace App\Models\AulaVirtual;
 
-use App\Models\Classroom;
+use App\Models\AulaVirtual\Classroom;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +14,7 @@ class Post extends Model
 
     protected $fillable = [
         'classroom_id',
-        'classroom_user_id',
+        'user_id',
         'type',
         'title',
         'content',
@@ -28,15 +28,8 @@ class Post extends Model
         return $this->belongsTo(Classroom::class);
     }
 
-    public function owner() : HasOneThrough
+    public function owner() : BelongsTo
     {
-        return $this->hasOneThrough(
-            User::class,
-            ClassroomUser::class,
-            'user_id',
-            'classroom_user_id',
-            'id',
-            'id'
-        );
+        return $this->belongsTo(User::class);
     }
 }

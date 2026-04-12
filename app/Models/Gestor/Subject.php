@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Gestor;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,10 +28,10 @@ class Subject extends Model
 
     //Query Functions
 
-    public static function getManyByCodesCollection(?Collection $codes = null) : Collection
+    public static function getManyByCodesCollection(?Collection $codes = null) : Collection|null
     {
         if(!$codes){
-            return static::make();
+            return null;
         }
         return static::whereIn('code',$codes)->get();
     }

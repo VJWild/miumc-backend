@@ -13,7 +13,7 @@ class Submission extends Model
 
     protected $fillable = [
         'assignment_id',
-        'classroom_user_id',
+        'user_id',
         'content',
         'file_path',
         'is_graded',
@@ -28,15 +28,8 @@ class Submission extends Model
         return $this->belongsTo(Assignment::class);
     }
 
-    public function student() : HasOneThrough
+    public function student() : BelongsTo
     {
-        return $this->hasOneThrough(
-            User::class,
-            ClassroomUser::class,
-            'user_id',
-            'classroom_user_id',
-            'id',
-            'id'
-        );
+        return $this->belongsTo(User::class);
     }
 }

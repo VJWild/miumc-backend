@@ -30,33 +30,43 @@ class SubmissionPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Submission $submission): bool
+    public function view(User $user, Submission $submission): Response
     {
-        return false;
+        return $user->id === $submission->user_id
+            || ($user->role === Roles::PROFESSOR && $user->id === $submission->assignment->classroom->user_id)
+             ? Response::allow()
+             : Response::deny('No tiene acceso a esta entrega.');
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user , Assignment $assignment): bool
+    public function create(User $user , Assignment $assignment): Response
     {
-        return $assignment->classroom()->members()->where('user_id',$user->id)->exists();
+        return $assignment->classroom->members->contains($user)
+            ?  Response::allow()
+            :  Response::deny('No tienes los permisos para realizar esta acción.');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Submission $submission): bool
+    public function update(User $user, Submission $submission): Response
     {
-        return false;
+        return $user->id === $submission->user_id
+            || ($user->role === Roles::PROFESSOR && $user->id === $submission->assignment->classroom->user_id)
+             ? Response::allow()
+             : Response::deny('No tiene acceso a esta entrega.');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Submission $submission): bool
+    public function delete(User $user, Submission $submission): Response
     {
-        return false;
+        return $user->id === $submission->student->id
+             ? Response::allow()
+             : Response::deny('No tiene los permisos para realizar esta acción');
     }
 
     /**

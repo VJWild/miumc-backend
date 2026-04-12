@@ -6,7 +6,7 @@ use App\Models\AulaVirtual\Assignment;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 use App\Constants\Roles;
-use App\Models\Classroom;
+use App\Models\AulaVirtual\Classroom;
 
 class AssignmentPolicy
 {
@@ -20,9 +20,11 @@ class AssignmentPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(User $user, Classroom $classroom): Response
     {
-        return false;
+        return $classroom->members()->wherePivot('user_id',$user->id)->exists()
+             ? Response::allow()
+             : Response::deny('No tiene accesso a esta aula.');
     }
 
     /**
@@ -31,7 +33,7 @@ class AssignmentPolicy
     public function view(User $user, Assignment $assignment): Response
     {
         return $user->id === $assignment->classroom->user_id
-            || $assignment->classroom()->members()->where('user_id',$user->id)->exists()
+            || $assignment->classroom->members->contains($user)
             ?  Response::allow()
             :  Response::deny('No tienes los permisos para realizar esta acción');
     }

@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\AulaVirtual;
 
 use App\Models\AulaVirtual\Assignment;
 use App\Models\AulaVirtual\Post;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;

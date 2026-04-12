@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Gestor;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AcademicRecord extends Model

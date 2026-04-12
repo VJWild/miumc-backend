@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Constants\Roles;
-use App\Models\AcademicRecord;
-use App\Models\Subject;
+use App\Models\Gestor\AcademicRecord;
+use App\Models\Gestor\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -126,14 +126,20 @@ class AuthController extends Controller
              default=>[]
         };
 
+        //Si un usuario inicia sesión desde el mismo dispositivo, elimina los tokens anteriores de ESE dispositivo
+        $user->tokens()
+             ->where('ip_address', $request->ip())
+             ->where('user_agent',$request->userAgent())
+             ->delete();
+
         $tokenResult = $user->createToken($tokenName,$permissions); //Crea el Token
         $tokenModel = $tokenResult->accessToken;    //Instancia el modelo del Token para poder editarlo
         $tokenStr = $tokenResult->plainTextToken;   //Obtiene el string del token
 
         $tokenModel->forceFill([
             'ip_address' => $request->ip(),
-            'user_agent' => $request->header('User-Agent')
-        ]);
+            'user_agent' => $request->userAgent()
+        ])->save();
 
         return response()->json([
             'success' => true,

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\AulaVirtual;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AulaVirtual\AssignmentResource;
 use App\Models\AulaVirtual\Assignment;
-use App\Models\Classroom;
+use App\Models\AulaVirtual\Classroom;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +18,7 @@ class AssignmentController extends Controller
      */
     public function index(Classroom $classroom)
     {
-        Gate::authorize('view',$classroom);
+        Gate::authorize('viewAny',[Assignment::class,$classroom]);
 
         return AssignmentResource::collection($classroom->assignments);
     }
@@ -58,9 +58,11 @@ class AssignmentController extends Controller
      */
     public function show(Assignment $assignment)
     {
+        $assignment->load('classroom.members');
+        
         Gate::authorize('view',$assignment);
 
-        $assignment->load(['submissions']);
+        $assignment->classroom->unsetRelation('members');
         
         return new AssignmentResource($assignment);
     }
@@ -70,6 +72,8 @@ class AssignmentController extends Controller
      */
     public function update(Request $request, Assignment $assignment)
     {
+        $assignment->load('classroom');
+
         Gate::authorize('update',$assignment);
 
         $validated = $request->validate([
@@ -101,6 +105,8 @@ class AssignmentController extends Controller
      */
     public function destroy(Assignment $assignment)
     {
+        $assignment->load('classroom');
+
         Gate::authorize('delete',$assignment);
 
         if($assignment->file_path){

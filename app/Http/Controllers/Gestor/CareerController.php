@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Gestor;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Gestor\CareerResource;
 use Illuminate\Http\Request;
-use App\Models\Career;
+use App\Models\Gestor\Career;
 
 class CareerController extends Controller
 {

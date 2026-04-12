@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use Illuminate\Database\Eloquent\Collection;
+use App\Models\AulaVirtual\Classroom;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -99,6 +100,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Classroom::class, 'user_id');
     }
+
+    // public function isClassroomMember(Classroom $classroom = null) : bool
+    // {   
+    //     if($classroom == null){
+    //         return false;
+    //     }
+    //     return $classroom->members()->wherePivot('user_id',$this->id)->exists()
+    // }
 
     //Query Functions
 

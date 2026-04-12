@@ -2,7 +2,7 @@
 
 namespace App\Models\AulaVirtual;
 
-use App\Models\Classroom;
+use App\Models\AulaVirtual\Classroom;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;

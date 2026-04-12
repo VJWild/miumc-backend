@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Gestor;
 
 use App\Http\Controllers\Controller;
-use App\Models\Enrollment;
-use App\Models\Subject;
+use App\Models\Gestor\Enrollment;
+use App\Models\Gestor\Subject;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

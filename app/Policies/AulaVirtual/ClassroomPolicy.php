@@ -3,7 +3,7 @@
 namespace App\Policies\AulaVirtual;
 
 use App\Constants\Roles;
-use App\Models\Classroom;
+use App\Models\AulaVirtual\Classroom;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
@@ -30,7 +30,7 @@ class ClassroomPolicy
     public function view(User $user, Classroom $classroom): Response
     {
         return $classroom->user_id === $user->id
-            || $classroom->members()->where('user_id',$user->id)->exists()
+            || $classroom->members()->wherePivot('user_id',$user->id)->exists()
             ? Response::allow()
             : Response::deny('No tienes los permisos para acceder a este recurso.');
     }

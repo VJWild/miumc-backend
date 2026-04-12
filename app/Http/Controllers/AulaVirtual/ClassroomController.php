@@ -5,7 +5,7 @@ namespace App\Http\Controllers\AulaVirtual;
 use App\Constants\Roles;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AulaVirtual\ClassroomResource;
-use App\Models\Classroom;
+use App\Models\AulaVirtual\Classroom;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;

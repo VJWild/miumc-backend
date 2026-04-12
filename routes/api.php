@@ -3,6 +3,7 @@
 use App\Constants\Roles;
 use App\Http\Controllers\AulaVirtual\AssignmentController;
 use App\Http\Controllers\AulaVirtual\ClassroomController;
+use App\Http\Controllers\AulaVirtual\PostController;
 use App\Http\Controllers\AulaVirtual\SubmissionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Gestor\AcademicRecordController;
@@ -34,7 +35,10 @@ Route::middleware('auth:sanctum')->group(function () {
                                                                                 ->shallow();
         Route::apiResource('assignments.submissions',SubmissionController::class)->only(['index'])
                                                                                  ->scoped(['submissions'=>'id'])
-                                                                                 ->shallow();                                                                     
+                                                                                 ->shallow();
+        Route::apiResource('classrooms.posts',PostController::class)->except(['index','show'])
+                                                                    ->scoped(['posts'=>'id'])
+                                                                    ->shallow();                                                                                                         
     });
 
     //Rutas que solo pueden acceder los cadetes
@@ -50,6 +54,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('assignments.submissions',SubmissionController::class)->except(['index'])
                                                                              ->scoped(['submissions'=>'id'])
                                                                              ->shallow(); 
+    Route::apiResource('classrooms.posts',PostController::class)->only(['index','show'])
+                                                                ->scoped(['posts'=>'id'])
+                                                                ->shallow();                                                                    
     
     
     Route::get("progress/{code}",[SubjectController::class,"getStudentProgress"]);

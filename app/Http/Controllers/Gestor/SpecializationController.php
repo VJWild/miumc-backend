@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Gestor;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Gestor\SpecializationResource;
-use App\Models\Career;
+use App\Models\Gestor\Career;
 use Illuminate\Http\Request;
 
 class SpecializationController extends Controller

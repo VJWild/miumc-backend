@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Gestor;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Gestor\SubjectResource;
-use App\Models\AcademicRecord;
-use App\Models\Enrollment;
-use App\Models\Specialization;
+use App\Models\Gestor\AcademicRecord;
+use App\Models\Gestor\Enrollment;
+use App\Models\Gestor\Specialization;
 use Illuminate\Http\Request;
 
 class SubjectController extends Controller
@@ -67,5 +67,6 @@ class SubjectController extends Controller
     public function getStudentProgress($code = null){
         $progress = AcademicRecord::getApprovedSubjectsByStudentCode($code);
         return response()->json($progress->pluck('code'));
+
     }
 }
