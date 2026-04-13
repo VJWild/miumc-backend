@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class PostController extends Controller
 {
@@ -58,11 +59,9 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        $post->load('classroom.members');
+        $post->load('classroom');
 
         Gate::authorize('view',$post);
-
-        $post->classroom->unsetRelation('members');
 
         return new PostResource($post);
     }
@@ -72,7 +71,31 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $post->load('classroom');
+        
+        Gate::authorize('update',$post);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string|max:255',
+            'file' => 'sometimes|file|max:1028',
+        ]);
+
+        if($request->hasFile('file')){
+            if($post->file_path){
+                Storage::delete($post->file_path);
+            }
+            $validated['file_path'] = $request->file('file')->store('assigments_files');
+        }
+
+        $post->update($validated);
+        $post->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Has actualizado el post exitosamente.',
+            'post' => new PostResource($post)
+        ]);
     }
 
     /**

@@ -12,6 +12,7 @@ use App\Http\Controllers\Gestor\EnrollmentsController;
 use App\Http\Controllers\Gestor\SpecializationController;
 use App\Http\Controllers\Gestor\SubjectController;
 use App\Http\Controllers\UserController;
+use App\Models\AulaVirtual\Classroom;
 use Illuminate\Support\Facades\Route;
 
 Route::post('register',[AuthController::class,"register"]);
@@ -21,6 +22,11 @@ Route::post('onboarding/complete',[AuthController::class,"completeOnboarding"]);
 
 //Rutas protegidas por autenticación (Solo usuarios logeados pueden acceder)
 Route::middleware('auth:sanctum')->group(function () {
+    //Rutas que cualquier usuario autenticado puede acceder
+
+    Route::post('/classroom/join',[ClassroomController::class , 'join']);
+    Route::post('/classroom/{classroom}/leave',[ClassroomController::class,'leave']);
+
     //Rutas que solo pueden acceder los administradores
     Route::middleware('ability:' . Roles::ADMIN)->prefix('admin')->group(function (){
         Route::put("users/{user}/academic_records/bulk",[AcademicRecordController::class,"bulkUpdate"]);
@@ -29,10 +35,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Rutas que solo pueden acceder los profesores
     Route::middleware('ability:' . Roles::PROFESSOR . "," . Roles::ADMIN)->group(function (){
+        
+        Route::post('/classroom/{classroom}/kick/{user}',[ClassroomController::class,'kick']);
         Route::apiResource('classrooms',ClassroomController::class)->except(['index','show']);
         Route::apiResource('classrooms.assignments',AssignmentController::class)->except(['index','show'])
                                                                                 ->scoped(['assignments' => 'id'])
                                                                                 ->shallow();
+        Route::post('/submissions/{submission}/grade', [SubmissionController::class, 'grade']);
         Route::apiResource('assignments.submissions',SubmissionController::class)->only(['index'])
                                                                                  ->scoped(['submissions'=>'id'])
                                                                                  ->shallow();

@@ -51,13 +51,18 @@ class Classroom extends Model
 
     //Utilities
 
-    public static function generateUniqueCode()
+    public static function generateUniqueCode() : string
     {
         do{
             $code = Str::upper(Str::random(6));
         } while (static::where('access_code',$code)->exists());
 
         return $code;
+    }
+
+    public function isMember(User $user) : bool|null
+    {
+        return $this->members()->where('user_id',$user->id)->exists();
     }
 
     //Scopes

@@ -9,6 +9,7 @@ use App\Models\AulaVirtual\Classroom;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 
 class ClassroomController extends Controller
 {
@@ -19,11 +20,68 @@ class ClassroomController extends Controller
     {
         $user = $request->user();
 
-        $classrooms = $user->role === Roles::PROFESSOR
-            ? $user->managedClassrooms()->withCount('members')->get()
-            : $user->enrolledClassrooms()->with('professor')->get();
+        switch ($user->role) {
+            case Roles::PROFESSOR:
+                $classrooms = $user->managedClassrooms()->withCount('members')->get();
+                break;
+            
+            default:
+                $classrooms = $user->enrolledClassrooms()->with('professor')->get();
+                break;
+        }
 
         return ClassroomResource::collection($classrooms);
+    }
+
+    /**
+     * Funcion para "unirse" a una classroom.
+     */
+    public function join(Request $request){
+        $request->validate([
+            'access_code' => 'required|string|max:6'
+        ]);
+
+        $classroom = Classroom::query()->where('access_code',$request->access_code)->firstOrFail();
+
+        if($request->user()->enrolledClassrooms()->where('classroom_id',$classroom->id)->exists()){
+            return response()->json([
+                'success' => false,
+                'message' => "Ya eres miembro de esta Aula Virtual."
+            ]);
+        }
+
+        $request->user()->enrolledClassrooms()->syncWithoutDetaching([$classroom->id]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Te has unido a el aula  "'. $classroom->title . '" exitosamente.',
+            'classroom' => new ClassroomResource($classroom)
+        ]);
+    }
+    
+    /**
+     * Función para "abandonar" una classroom.
+     */
+    public function leave(Request $request, Classroom $classroom){
+        Gate::authorize('leave',$classroom);
+
+        $request->user()->enrolledClassrooms()->detach($classroom->id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ha abandonado el aula virtual exitosamente.'
+        ]);
+    }
+
+    public function kick(Classroom $classroom, User $user){
+        Gate::authorize('kickUser',$classroom);
+
+        $classroom->members()->detach($user->id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Usuario expulsado del aula virtual exitosamente.'
+        ]); 
     }
 
     /**

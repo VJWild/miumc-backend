@@ -4,8 +4,13 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Constants\Roles;
 use Illuminate\Database\Eloquent\Collection;
 use App\Models\AulaVirtual\Classroom;
+use App\Models\Gestor\AcademicRecord;
+use App\Models\Gestor\Career;
+use App\Models\Gestor\Enrollment;
+use App\Models\Gestor\Specialization;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -101,13 +106,10 @@ class User extends Authenticatable
         return $this->hasMany(Classroom::class, 'user_id');
     }
 
-    // public function isClassroomMember(Classroom $classroom = null) : bool
-    // {   
-    //     if($classroom == null){
-    //         return false;
-    //     }
-    //     return $classroom->members()->wherePivot('user_id',$this->id)->exists()
-    // }
+    public function isProffesor() : bool
+    {
+        return $this->role === Roles::PROFESSOR;
+    }
 
     //Query Functions
 

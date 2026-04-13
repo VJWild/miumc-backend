@@ -22,7 +22,7 @@ class AssignmentPolicy
      */
     public function viewAny(User $user, Classroom $classroom): Response
     {
-        return $classroom->members()->wherePivot('user_id',$user->id)->exists()
+        return $classroom->isMember($user)
              ? Response::allow()
              : Response::deny('No tiene accesso a esta aula.');
     }
@@ -33,7 +33,7 @@ class AssignmentPolicy
     public function view(User $user, Assignment $assignment): Response
     {
         return $user->id === $assignment->classroom->user_id
-            || $assignment->classroom->members->contains($user)
+            || $assignment->classroom->isMember($user)
             ?  Response::allow()
             :  Response::deny('No tienes los permisos para realizar esta acción');
     }
@@ -43,7 +43,7 @@ class AssignmentPolicy
      */
     public function create(User $user, Classroom $classroom): Response
     {
-        return $user->role === Roles::PROFESSOR
+        return $user->isProffesor()
             && $classroom->user_id === $user->id
             ? Response::allow()
             : Response::deny('No tienes los permisos para realizar esta acción.');
@@ -54,7 +54,7 @@ class AssignmentPolicy
      */
     public function update(User $user, Assignment $assignment): Response
     {
-        return $user->role === Roles::PROFESSOR 
+        return $user->isProffesor() 
             && $assignment->classroom->user_id === $user->id 
             ?  Response::allow()
             :  Response::deny('No tienes los permisos para realizar esta acción.');
@@ -65,7 +65,7 @@ class AssignmentPolicy
      */
     public function delete(User $user, Assignment $assignment): Response
     {
-        return $user->role === Roles::PROFESSOR 
+        return $user->isProffesor() 
             && $user->id === $assignment->classroom->user_id
             ?  Response::allow()
             :  Response::deny('No tiene los permisos para realizar esta acción.');

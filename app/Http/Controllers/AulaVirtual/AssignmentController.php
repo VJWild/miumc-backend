@@ -58,11 +58,9 @@ class AssignmentController extends Controller
      */
     public function show(Assignment $assignment)
     {
-        $assignment->load('classroom.members');
+        $assignment->load('classroom');   
         
         Gate::authorize('view',$assignment);
-
-        $assignment->classroom->unsetRelation('members');
         
         return new AssignmentResource($assignment);
     }

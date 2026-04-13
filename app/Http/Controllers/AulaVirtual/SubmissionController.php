@@ -77,10 +77,6 @@ class SubmissionController extends Controller
 
         Gate::authorize('update',$submission);
 
-        if($request->user()->role === Roles::PROFESSOR && is_null($submission->is_graded)){
-            return $this->gradeSubmission($request,$submission);
-        }
-
         $validated = $request->validate([
             'content' => 'string|max:255',
             'file' => 'sometimes|required|file|max:5048',
@@ -104,6 +100,31 @@ class SubmissionController extends Controller
     }
 
     /**
+     * Función para calificar entregas (Profesores)
+     */    
+    public function grade(Request $request, Submission $submission){
+        $submission->load('assignment.classroom');
+
+        Gate::authorize('grade',$submission);
+
+        $validated = $request->validate([
+            'grade' => 'required|decimal:0,20',
+            'teacher_feedback' => 'string|max:255'
+        ]);
+
+        $validated['is_graded'] = true;
+
+        $submission->update($validated);
+        $submission->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Entrega calificada correctamente.',
+            'submission' => new SubmissionResource($submission) 
+        ]);
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Submission $submission)
@@ -121,27 +142,6 @@ class SubmissionController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'La entrega se ha eliminado correctamente.'
-        ]);
-    }
-
-    /**
-     * Función para calificar entregas (Profesores)
-     */    
-    private function gradeSubmission(Request $request, Submission $submission){
-        $validated = $request->validate([
-            'grade' => 'required|decimal:0,20',
-            'teacher_feedback' => 'string|max:255'
-        ]);
-
-        $validated['is_graded'] = true;
-
-        $submission->update($validated);
-        $submission->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Entrega calificada correctamente.',
-            'submission' => new SubmissionResource($submission) 
         ]);
     }
 }

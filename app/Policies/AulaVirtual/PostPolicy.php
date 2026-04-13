@@ -23,7 +23,7 @@ class PostPolicy
      */
     public function viewAny(User $user,Classroom $classroom): Response
     {
-        return $classroom->members()->wherePivot('user_id',$user->id)->exists()
+        return $classroom->isMember($user)
             || $user->id === $classroom->user_id
              ? Response::allow()
              : Response::deny('No eres miembro de esta aula.');
@@ -34,7 +34,7 @@ class PostPolicy
      */
     public function view(User $user, Post $post): Response
     {
-        return $post->classroom->members->contains($user)
+        return $post->classroom->isMember($user)
             || $post->classroom->user_id === $user->id
              ? Response::allow()
              : Response::deny('No tienes acceso a este contenido.');
@@ -45,7 +45,7 @@ class PostPolicy
      */
     public function create(User $user,Classroom $classroom): Response
     {
-        return $classroom->members()->wherePivot('user_id',$user->id)->exists()
+        return $classroom->isMember($user)
             || $classroom->user_id === $user->id
              ? Response::allow()
              : Response::deny('No tiene los permisos para realizar esta acción');
@@ -54,9 +54,12 @@ class PostPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Post $post): bool
+    public function update(User $user, Post $post): Response
     {
-        return false;
+        return $user->id === $post->user_id 
+            || ($user->isProffesor() && $user->id === $post->classroom->user_id)
+             ? Response::allow() 
+             : Response::deny('No tienes los permisos para realizar esta acción.');
     }
 
     /**

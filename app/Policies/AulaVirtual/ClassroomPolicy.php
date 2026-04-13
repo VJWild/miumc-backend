@@ -30,9 +30,23 @@ class ClassroomPolicy
     public function view(User $user, Classroom $classroom): Response
     {
         return $classroom->user_id === $user->id
-            || $classroom->members()->wherePivot('user_id',$user->id)->exists()
+            || $classroom->isMember($user)
             ? Response::allow()
             : Response::deny('No tienes los permisos para acceder a este recurso.');
+    }
+
+    public function leave(User $user, Classroom $classroom): Response
+    {
+        return $classroom->isMember($user)
+             ? Response::allow()
+             : Response::deny('No tienes los permisos para realizar esta acción.');
+    }
+
+    public function kickUser(User $user, Classroom $classroom): Response
+    {
+        return $user->id === $classroom->user_id
+             ? Response::allow()
+             : Response::deny('No tienes los permisos para realizar esta acción.');
     }
 
     /**
@@ -40,7 +54,7 @@ class ClassroomPolicy
      */
     public function create(User $user): Response
     {
-        return $user->role === Roles::PROFESSOR
+        return $user->isProffesor()
             ? Response::allow()
             : Response::deny('No tienes los permisos para realizar esta acción');
     }
